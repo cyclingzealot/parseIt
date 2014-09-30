@@ -5,13 +5,15 @@ while(true); do
     validateJSON.bash $file > /dev/null 2>&1
     validJSON=$?
 
-    firstNonWhiteLine=`egrep -v '^[[:space:]]*$' $file`
+    firstNonWhiteLine=`sed '/^\s*$/d' $file | head -n 1`
 
     echo $firstNonWhiteLine | grep '{' > /dev/null 2>&1
     startsWithCurly=$?
 
-    echo $firstNonWhiteLine | grep '<html>' > /dev/null 2>&1
+    echo $firstNonWhiteLine | grep 'html' > /dev/null 2>&1
     hasHTMLtag=$?
+
+
 
    
     if [ "$validJSON" -eq "0" ] ; then
@@ -21,7 +23,9 @@ while(true); do
     elif [ "$startsWithCurly" -eq "0" ] ; then
         # If it looks like JSON but non valid, show the validator output 
         echo
+        echo $firstNonWhiteLine | head -n 3
         validateJSON.bash $file
+        gnome-terminal -e "vi $file" &
         echo
 
     elif [ "$hasHTMLtag" -eq "0" ] ; then
